@@ -1,0 +1,93 @@
+version: '3.3'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - /mnt/c/projects/delta_test:/usr/src/app
+    ports:
+      - 1895:8000
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-d*pn&wz3!nkqtuk(+(2&g(l*f)(=(so^26tikhv*hj+b62cq_f
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=delta_test
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    networks:
+      - delta_test_network
+    depends_on:
+      - redis
+      - postgres
+
+  celery:
+    build: .
+    command: celery --app=src worker --loglevel=info
+    volumes:
+      - /mnt/c/projects/delta_test:/usr/src/app
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-d*pn&wz3!nkqtuk(+(2&g(l*f)(=(so^26tikhv*hj+b62cq_f
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=delta_test
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    depends_on:
+      - web
+      - redis
+      - postgres
+    networks:
+      - delta_test_network
+
+  beat:
+    build: .
+    command: celery --app=src beat --loglevel=info
+    volumes:
+      - /mnt/c/projects/delta_test:/usr/src/app
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-d*pn&wz3!nkqtuk(+(2&g(l*f)(=(so^26tikhv*hj+b62cq_f
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=delta_test
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    depends_on:
+      - web
+      - redis
+      - postgres
+    networks:
+      - delta_test_network
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    networks:
+      - delta_test_network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: delta_test
+    networks:
+      - delta_test_network
+    ports:
+      - "5433:5432"
+
+networks:
+  delta_test_network:
+    name: delta_test_network

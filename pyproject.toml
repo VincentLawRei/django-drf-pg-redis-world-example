@@ -1,0 +1,30 @@
+[tool.black]
+line-length = 100
+exclude = '''
+(
+  /(
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+| migrations
+)
+'''
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_gitignore = true
+skip_glob = ["**/migrations/*", "**/settings/*"]
+
+[tool.flake8]
+max-line-length = 100
+max-complexity = 10
+ignore = ["F841"]
