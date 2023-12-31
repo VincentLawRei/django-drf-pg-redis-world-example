@@ -5,7 +5,7 @@ services:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - /mnt/c/projects/delta_test:/usr/src/app
+      - .:/usr/src/app
     ports:
       - 1895:8000
     environment:
@@ -27,7 +27,7 @@ services:
     build: .
     command: celery --app=src worker --loglevel=info
     volumes:
-      - /mnt/c/projects/delta_test:/usr/src/app
+      - .:/usr/src/app
     environment:
       - DEBUG=1
       - SECRET_KEY=django-insecure-d*pn&wz3!nkqtuk(+(2&g(l*f)(=(so^26tikhv*hj+b62cq_f
@@ -50,7 +50,7 @@ services:
     build: .
     command: celery --app=src beat --loglevel=info
     volumes:
-      - /mnt/c/projects/delta_test:/usr/src/app
+      - .:/usr/src/app
     environment:
       - DEBUG=1
       - SECRET_KEY=django-insecure-d*pn&wz3!nkqtuk(+(2&g(l*f)(=(so^26tikhv*hj+b62cq_f
